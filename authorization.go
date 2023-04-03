@@ -21,8 +21,8 @@ func Authorization(excludedPaths []string, requiredGroup string) func(http.Handl
 			}
 
 			// now get the groups and the username which were set as a header
-			groupString := r.Header.Get("X-Groups")
-			username := r.Header.Get("X-User")
+			groupString := r.Header.Get("X-Authenticated-Groups")
+			username := r.Header.Get("X-Authenticated-User")
 
 			// now check if any groups were set
 			if strings.TrimSpace(groupString) == "" {
