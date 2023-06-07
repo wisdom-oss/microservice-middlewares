@@ -1,10 +1,11 @@
 package wisdomMiddleware
 
 import (
-	"github.com/rs/zerolog/log"
-	"github.com/wisdom-oss/microservice-utils"
 	"net/http"
 	"strings"
+
+	"github.com/rs/zerolog/log"
+	"github.com/wisdom-oss/microservice-utils"
 )
 
 func Authorization(excludedPaths []string, requiredGroup string) func(http.Handler) http.Handler {

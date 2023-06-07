@@ -1,0 +1,4 @@
+github.com/wisdom-oss/commonTypes v1.0.0 h1:+KuD3l+g1P6K2DwyC0nqo0RrpZdKiAoMLOBhQIce7WQ=
+github.com/wisdom-oss/commonTypes v1.0.0/go.mod h1:Q7X33dplhIdZxIbJRyTLhk9ojrDN6chq9D5xExToUEo=
+github.com/wisdom-oss/microservice-utils v1.0.0 h1:zPgMTv9o01FKYsaclugUdSKFepTMJyJ93SPcRpElNWg=
+github.com/wisdom-oss/microservice-utils v1.0.0/go.mod h1:f+UsuRlxA0WpbM+gjVbqSYieYyIKzoe/HK+lwyF/W1Y=
