@@ -103,6 +103,7 @@ func WISdoMErrorHandler(errors map[string]wisdomType.WISdoMError) func(http.Hand
 							panic("using unregistered error")
 						}
 						_ = e.Send(w)
+						b <- true
 						return
 					}
 				}
