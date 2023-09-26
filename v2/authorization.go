@@ -55,9 +55,9 @@ func Authorization(c wisdomType.AuthorizationConfiguration, serviceName string) 
 				}
 
 				// now get the values for the authorization information header
-				rawIsAdmin := strings.TrimSpace(r.Header.Get("X-Superuser"))
-				rawGroups := strings.TrimSpace(r.Header.Get("X-Authenticated-Groups"))
-				user := strings.TrimSpace(r.Header.Get("X-Authenticated-User"))
+				rawIsAdmin := strings.TrimSpace(r.Header.Get("X-Is-Staff"))
+				rawGroups := strings.TrimSpace(r.Header.Get("X-WISdoM-Groups"))
+				user := strings.TrimSpace(r.Header.Get("X-WISdoM-User"))
 
 				// now try to parse the admin header
 				isAdmin, err := strconv.ParseBool(rawIsAdmin)
