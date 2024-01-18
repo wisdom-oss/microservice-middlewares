@@ -75,7 +75,7 @@ func ErrorHandler(serviceName string, errors map[string]wisdomType.WISdoMError) 
 						case error:
 							err := data.(error)
 							e := wisdomType.WISdoMError{}
-							e.WrapError(err)
+							e.WrapError(err, serviceName)
 							_ = e.Send(w)
 							output <- true
 							return
