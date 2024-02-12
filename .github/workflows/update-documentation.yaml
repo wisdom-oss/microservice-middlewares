@@ -4,8 +4,6 @@ on: push
 jobs:
   build-documentation:
     runs-on: ubuntu-latest
-    outputs:
-      documentation: ${{ steps.generate-markdown.outputs.documentation }}
     steps:
       - uses: actions/checkout@v4
 
@@ -18,7 +16,13 @@ jobs:
 
       - name: Generate Documentation
         id: generate-markdown
-        run: echo "documentation=$(gomarkdoc .)" >> $GITHUB_OUTPUT
+        run: gomarkoc --output generated-documentation.md .
+
+      - name: Upload documentation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation
+          path: generated-documentation.md
 
   push-documentation:
     runs-on: ubuntu-latest
@@ -29,15 +33,18 @@ jobs:
         with:
           ref: 'docs'
 
+      - name: Download Generated Documentation
+        uses: actions/download-artifact@v4
+        with:
+          name: documentation
+
       - name: Create branch folder
         shell: bash
         run: mkdir -p ${{ github.ref }}
 
       - name: Update documentation file
         shell: bash
-        run: |
-          cd ${{ github.ref }}
-          echo "${{ needs.build-documentation.outputs.documentation }} > README.md
+        run: mv generated-documentation.md ${{ github.ref }}/README.md
 
       - name: Push updated documentation
         uses: actions-js/push@master
