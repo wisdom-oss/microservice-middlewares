@@ -22,7 +22,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: documentation
-          path: generated-documentation.md
+          path: |
+            generated-documentation.md
+            README.md
 
   push-documentation:
     runs-on: ubuntu-latest
@@ -44,7 +46,9 @@ jobs:
 
       - name: Update documentation file
         shell: bash
-        run: mv generated-documentation.md ${{ github.ref_name }}/README.md
+        run: |
+          mv generated-documentation.md ${{ github.ref_name }}/docs.md
+          mv README.md ${{ github.ref_name }}/docs.md
 
       - name: Push updated documentation
         uses: actions-js/push@master
