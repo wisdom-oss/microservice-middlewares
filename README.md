@@ -16,4 +16,4 @@ your code and start using them.
 import "github.com/wisdom-oss/microservice-middlewares/v4"
 ```
 
-> Further documentation [here](v4/README.md)
+> Further documentation [here](docs.md)

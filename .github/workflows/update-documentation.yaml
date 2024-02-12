@@ -48,7 +48,7 @@ jobs:
         shell: bash
         run: |
           mv generated-documentation.md ${{ github.ref_name }}/docs.md
-          mv README.md ${{ github.ref_name }}/docs.md
+          mv README.md ${{ github.ref_name }}/README.md
 
       - name: Push updated documentation
         uses: actions-js/push@master
