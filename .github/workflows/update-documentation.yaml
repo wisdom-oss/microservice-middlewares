@@ -16,7 +16,7 @@ jobs:
 
       - name: Generate Documentation
         id: generate-markdown
-        run: gomarkoc --output generated-documentation.md .
+        run: gomarkdoc --output generated-documentation.md .
 
       - name: Upload documentation artifact
         uses: actions/upload-artifact@v4
