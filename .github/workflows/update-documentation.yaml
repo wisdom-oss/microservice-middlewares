@@ -1,0 +1,58 @@
+name: Update Documentation
+on: push
+
+jobs:
+  build-documentation:
+    runs-on: ubuntu-latest
+    outputs:
+      documentation: ${{ steps.generate-markdown.outputs.documentation }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Install gomarkdoc
+        run: go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest
+
+      - name: Generate Documentation
+        id: generate-markdown
+        run: echo "documentation=$(gomarkdoc .)" >> $GITHUB_OUTPUT
+
+  push-documentation:
+    runs-on: ubuntu-latest
+    needs:
+      - build-documentation
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 'docs'
+
+      - name: Create branch folder
+        shell: bash
+        run: mkdir -p ${{ github.ref }}
+
+      - name: Update documentation file
+        shell: bash
+        run: |
+          cd ${{ github.ref }}
+          echo "${{ needs.build-documentation.outputs.documentation }} > README.md
+
+      - name: Push updated documentation
+        uses: actions-js/push@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          coauthor_email: ${{ github.event.head_commit.author.email }}
+          coauthor_name: ${{ github.event.head_commit.author.name }}
+          message: ${{ github.event.head_commit.message }}
+          branch: 'docs'
+
+  trigger-container-update:
+    runs-on: ubuntu-latest
+    needs:
+      - push-documentation
+    steps:
+      - name: Trigger Update
+        run: |
+          curl -f -X PUT --oauth-bearer "${{secrets.DOCS_ADMIN_TOKEN}}" ${{secrets.DOCS_ADMIN_ENDPOINT}}/update > /dev/null
