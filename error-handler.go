@@ -8,8 +8,10 @@ import (
 	wisdomType "github.com/wisdom-oss/commonTypes/v2"
 )
 
-const ERROR_CHANNEL_NAME = "error-channel"
-const STATUS_CHANNEL_NAME = "status-channel"
+const (
+	ErrorChannelName = string(rune(iota))
+	StatusChannelName
+)
 
 // ErrorHandler allows the global handling and wrapping errors
 // occurring in API calls. The function needs the service name as a parameter
@@ -19,12 +21,12 @@ const STATUS_CHANNEL_NAME = "status-channel"
 // To access the channel added to the request context in an http handler use
 // the following call:
 //
-//	errorHandler := r.Context().Value("error-channel").(chan<- interface{})
+//	errorHandler := r.Context().Value(middleware.ErrorChannelName).(chan<- interface{})
 //
 // To watch for the handling to be completed, use the following channel from
 // the handler
 //
-//	errorHandled :=  r.Context().Value("status.channel").(<-chan bool)
+//	errorHandled :=  r.Context().Value(middleware.StatusChannelName).(<-chan bool)
 //
 // To handle an error just send it into the error handler channel and listen on
 // the statusChannel for a boolean return.
@@ -35,7 +37,7 @@ const STATUS_CHANNEL_NAME = "status-channel"
 // After handling the error it is recommended to exit the handler to hide errors
 // and warnings about the http response writer being called when closed or tying
 // to write headers again
-func ErrorHandler(serviceName string, errors map[string]wisdomType.WISdoMError) func(http.Handler) http.Handler {
+func ErrorHandler(errors map[string]wisdomType.WISdoMError) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// create a channel for receiving errors and strings by using
@@ -46,8 +48,8 @@ func ErrorHandler(serviceName string, errors map[string]wisdomType.WISdoMError) 
 			statusChannel := make(chan bool)
 			// now attach the two channels to the request context
 			ctx := r.Context()
-			ctx = context.WithValue(ctx, ERROR_CHANNEL_NAME, prepareInputChannel(input))
-			ctx = context.WithValue(ctx, STATUS_CHANNEL_NAME, prepareStatusChannel(statusChannel))
+			ctx = context.WithValue(ctx, ErrorChannelName, prepareInputChannel(input))
+			ctx = context.WithValue(ctx, StatusChannelName, prepareStatusChannel(statusChannel))
 			// now use a goroutine to make the error handling code asynchronous
 			go func() {
 				for {
