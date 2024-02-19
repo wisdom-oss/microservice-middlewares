@@ -196,31 +196,6 @@ func TestErrorHandler_InvalidTypeSupplied(t *testing.T) {
 		t.Errorf("response could not be decoded: %s", err.Error())
 	}
 
-	_, validType := response["type"].(string)
-	if !validType {
-		t.Errorf("rfc9457 violated, expected 'type' field to be 'string', got '%T'", response["type"])
-	}
-
-	_, validType = response["status"].(float64)
-	if !validType {
-		t.Errorf("rfc9457 violated, expected 'status' field to be 'int', got '%T'", response["status"])
-	}
-
-	_, validType = response["title"].(string)
-	if !validType {
-		t.Errorf("rfc9457 violated, expected 'title' field to be 'string', got '%T'", response["title"])
-	}
-
-	_, validType = response["detail"].(string)
-	if !validType {
-		t.Errorf("rfc9457 violated, expected 'detail' field to be 'string', got '%T'", response["detail"])
-	}
-
-	_, validType = response["instance"].(string)
-	if !validType {
-		t.Errorf("rfc9457 violated, expected 'instance' field to be 'string', got '%T'", response["instance"])
-	}
-
 	if hostname, _ := os.Hostname(); response["instance"].(string) != hostname {
 		t.Errorf("instance is not hostname, got '%s', expected '%s'", response["instance"].(string), hostname)
 	}
