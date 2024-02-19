@@ -10,7 +10,7 @@ import "github.com/wisdom-oss/microservice-middlewares/v4"
 
 - [Constants](<#constants>)
 - [Variables](<#variables>)
-- [func Authorization\(config wisdomType.AuthorizationConfiguration, serviceName string\) func\(http.Handler\) http.Handler](<#Authorization>)
+- [func Authorization\(serviceName string\) func\(http.Handler\) http.Handler](<#Authorization>)
 - [func ErrorHandler\(errors map\[string\]wisdomType.WISdoMError\) func\(http.Handler\) http.Handler](<#ErrorHandler>)
 
 
@@ -141,7 +141,7 @@ var InvalidTypeProvided = wisdomType.WISdoMError{
 ## func Authorization
 
 ```go
-func Authorization(config wisdomType.AuthorizationConfiguration, serviceName string) func(http.Handler) http.Handler
+func Authorization(serviceName string) func(http.Handler) http.Handler
 ```
 
 
