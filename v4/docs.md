@@ -10,24 +10,121 @@ import "github.com/wisdom-oss/microservice-middlewares/v4"
 
 - [Constants](<#constants>)
 - [Variables](<#variables>)
-- [func ErrorHandler\(serviceName string, errors map\[string\]wisdomType.WISdoMError\) func\(http.Handler\) http.Handler](<#ErrorHandler>)
+- [func Authorization\(config wisdomType.AuthorizationConfiguration, serviceName string\) func\(http.Handler\) http.Handler](<#Authorization>)
+- [func ErrorHandler\(errors map\[string\]wisdomType.WISdoMError\) func\(http.Handler\) http.Handler](<#ErrorHandler>)
 
 
 ## Constants
 
-<a name="ERROR_CHANNEL_NAME"></a>
+<a name="ErrorChannelName"></a>
 
 ```go
-const ERROR_CHANNEL_NAME = "error-channel"
-```
-
-<a name="STATUS_CHANNEL_NAME"></a>
-
-```go
-const STATUS_CHANNEL_NAME = "status-channel"
+const (
+    ErrorChannelName = string(rune(iota))
+    StatusChannelName
+)
 ```
 
 ## Variables
+
+<a name="ErrJWTExpired"></a>ErrJWTExpired is returned if the JWT in the request is already expired
+
+```go
+var ErrJWTExpired = wisdomType.WISdoMError{
+    Type:   "https://www.rfc-editor.org/rfc/rfc6750.html#section-3.1",
+    Status: 401,
+    Title:  "JSON Web Token Expired",
+    Detail: "The JSON Web Token used to access this resource has expired. Access has been denied",
+}
+```
+
+<a name="ErrJWTInvalidIssuer"></a>ErrJWTInvalidIssuer is returned if the JWTs issuer field indicates that it has not been issued by the API Gateway
+
+```go
+var ErrJWTInvalidIssuer = wisdomType.WISdoMError{
+    Type:   "https://www.rfc-editor.org/rfc/rfc6750.html#section-3.1",
+    Status: 401,
+    Title:  "JSON Web Token Issuer Wrong",
+    Detail: "The JSON Web Token used to access this resource has not been issued by the correct issuer. Please check your authentication provider.",
+}
+```
+
+<a name="ErrJWTMalformed"></a>ErrJWTMalformed is returned if the request did contain a JWT but is malformed
+
+```go
+var ErrJWTMalformed = wisdomType.WISdoMError{
+    Type:   "https://www.rfc-editor.org/rfc/rfc9110#section-15.5.1",
+    Status: 400,
+    Title:  "JSON Web Token Malformed",
+    Detail: "The JSON Web Token presented as Bearer Token is not correctly formatted",
+}
+```
+
+<a name="ErrJWTNoGroups"></a>ErrJWTNoGroups is returned if the JWT did not contain the group claim and therefore is not usable for the service
+
+```go
+var ErrJWTNoGroups = wisdomType.WISdoMError{
+    Type:   "https://www.rfc-editor.org/rfc/rfc9110#section-15.5.1",
+    Status: 400,
+    Title:  "JSON Web Token No Groups Claim",
+    Detail: "The JSON Web Token used to access this resource did not contain the required `groups` claim",
+}
+```
+
+<a name="ErrJWTNotCreatedYet"></a>ErrJWTNotCreatedYet is returned if the JWTs iat field indicating at which the token has been issued is in the future
+
+```go
+var ErrJWTNotCreatedYet = wisdomType.WISdoMError{
+    Type:   "https://www.rfc-editor.org/rfc/rfc6750.html#section-3.1",
+    Status: 401,
+    Title:  "JSON Web Token Used Before Creation",
+    Detail: "The JSON Web Token used to access this resource been created in the future, therefore it is invalid and the access has been denied. Please check your authentication provider.",
+}
+```
+
+<a name="ErrJWTNotYetValid"></a>ErrJWTNotYetValid is returned if the field indicating a time before the jwt is not valid contains a time in the future
+
+```go
+var ErrJWTNotYetValid = wisdomType.WISdoMError{
+    Type:   "https://www.rfc-editor.org/rfc/rfc6750.html#section-3.1",
+    Status: 401,
+    Title:  "JSON Web Token Used Before Validity",
+    Detail: "The JSON Web Token used to access this resource has been used before it is permitted to be used. Access has been denied",
+}
+```
+
+<a name="ErrMissingAuthorizationHeader"></a>ErrMissingAuthorizationHeader is returned if the request did not contain the \`Authorization\` header
+
+```go
+var ErrMissingAuthorizationHeader = wisdomType.WISdoMError{
+    Type:   "https://www.rfc-editor.org/rfc/rfc6750.html#section-3.1",
+    Status: 401,
+    Title:  "Missing Authorization Header",
+    Detail: "The request did not contain the 'Authorization' header. Please check your request.",
+}
+```
+
+<a name="ErrUnsupportedTokenScheme"></a>ErrUnsupportedTokenScheme is returned if the request did not utilize the Bearer token scheme as documented in [RFC 6750](<https://www.rfc-editor.org/rfc/rfc6750>).
+
+```go
+var ErrUnsupportedTokenScheme = wisdomType.WISdoMError{
+    Type:   "https://www.rfc-editor.org/rfc/rfc6750.html#section-3.1",
+    Status: 400,
+    Title:  "Unsupported Token Scheme used",
+    Detail: "The token scheme used in this request is not supported by the service. Please check your request.",
+}
+```
+
+<a name="Forbidden"></a>Forbidden is returned if the user is authenticated but not authorized to access the resource
+
+```go
+var Forbidden = wisdomType.WISdoMError{
+    Type:   "https://www.rfc-editor.org/rfc/rfc9110#section-15.5.4",
+    Status: 403,
+    Title:  "Access Forbidden",
+    Detail: "The user is not in the appropriate user group to access this service",
+}
+```
 
 <a name="InvalidTypeProvided"></a>InvalidTypeProvided represents an internal error which is sent if an invalid type as been provided to the input channel of the error handler
 
@@ -40,11 +137,20 @@ var InvalidTypeProvided = wisdomType.WISdoMError{
 }
 ```
 
+<a name="Authorization"></a>
+## func Authorization
+
+```go
+func Authorization(config wisdomType.AuthorizationConfiguration, serviceName string) func(http.Handler) http.Handler
+```
+
+
+
 <a name="ErrorHandler"></a>
 ## func ErrorHandler
 
 ```go
-func ErrorHandler(serviceName string, errors map[string]wisdomType.WISdoMError) func(http.Handler) http.Handler
+func ErrorHandler(errors map[string]wisdomType.WISdoMError) func(http.Handler) http.Handler
 ```
 
 ErrorHandler allows the global handling and wrapping errors occurring in API calls. The function needs the service name as a parameter to correctly generate the error code used in the wisdomType.WISdoMError. Furthermore, it also accepts the usage of preregistered errors
@@ -52,13 +158,13 @@ ErrorHandler allows the global handling and wrapping errors occurring in API cal
 To access the channel added to the request context in an http handler use the following call:
 
 ```
-errorHandler := r.Context().Value("error-channel").(chan<- interface{})
+errorHandler := r.Context().Value(middleware.ErrorChannelName).(chan<- interface{})
 ```
 
 To watch for the handling to be completed, use the following channel from the handler
 
 ```
-errorHandled :=  r.Context().Value("status.channel").(<-chan bool)
+errorHandled :=  r.Context().Value(middleware.StatusChannelName).(<-chan bool)
 ```
 
 To handle an error just send it into the error handler channel and listen on the statusChannel for a boolean return.
