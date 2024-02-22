@@ -28,7 +28,7 @@ func TestErrorHandler_NativeError(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	r := chi.NewRouter()
-	r.Use(ErrorHandler(errorMap))
+	r.Use(ErrorHandler)
 
 	r.Get("/", func(writer http.ResponseWriter, r *http.Request) {
 		errorChannel := r.Context().Value(ErrorChannelName).(chan<- interface{})
@@ -95,7 +95,7 @@ func TestErrorHandler_WISdoMError(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	r := chi.NewRouter()
-	r.Use(ErrorHandler(errorMap))
+	r.Use(ErrorHandler)
 
 	r.Get("/", func(writer http.ResponseWriter, r *http.Request) {
 		errorChannel := r.Context().Value(ErrorChannelName).(chan<- interface{})
@@ -169,7 +169,7 @@ func TestErrorHandler_InvalidTypeSupplied(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	r := chi.NewRouter()
-	r.Use(ErrorHandler(errorMap))
+	r.Use(ErrorHandler)
 
 	r.Get("/", func(writer http.ResponseWriter, r *http.Request) {
 		errorChannel := r.Context().Value(ErrorChannelName).(chan<- interface{})
